@@ -2,7 +2,7 @@ terrain = {
 
  -- base attributes
  n_changes = {8, 15},
- grade = {0.2, 0.7},
+ grade = {0.3, 0.8},
  g = 3,
 
  -- constructor

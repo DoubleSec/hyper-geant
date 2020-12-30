@@ -51,6 +51,10 @@ function _draw()
   ter:draw(player)
   course:draw(player)
 
+  cursor(0, 96, 5)
+  print(stat(1))
+  print(stat(2))
+
  end
 end
 -->8
