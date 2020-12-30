@@ -6,37 +6,22 @@ function _init()
  -- fill map
  for x = 0,16 do
   for y = 0,16 do
-   if x % 2 == 1 and y % 2 == 1 then
-    mset(x+16, y, 2)
-   end
    mset(x, y, 1)
   end
  end
 
  course = downhill:new(-10000, 1)
-
- -- set up flags
- -- this is the wrong way to do
- --  this.
- flg_list = {}
- flg_list.x = {}
- flg_list.y = {}
-
- for i = 1, 500 do
-  flg_list.x[i] = flr(rnd(100))
-  flg_list.y[i] = flr(rnd(3000)) + player.world_y
- end
+ ter = terrain:new(-10000, course.len + 50, 1)
 
  -- debug stepping
  debug = false
 
 end
 
-
 function _update60()
 
  if btnp(4) or not debug then
- 	player:update()
+ 	player:update(ter)
   course:update(player)
  end
 end
@@ -62,15 +47,8 @@ function _draw()
 
   camera(0,0)
 
-  -- draw flags
-  --  also currently wrong, will fix later
-  for i = 1,10 do
-   if flg_list.y[i] > player.world_y - 128 and flg_list.y[i] < player.world_y + 128 then
-    spr(4, flg_list.x[i] - player.world_x, flg_list.y[i] - player.world_y)
-   end
-  end
-
   player:draw()
+  ter:draw(player)
   course:draw(player)
 
  end
@@ -78,6 +56,7 @@ end
 -->8
 #include player_class.lua
 #include downhill.lua
+#include terrain.lua
 
 __gfx__
 00000000777777770000000000000000008885000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

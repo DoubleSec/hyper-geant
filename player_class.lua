@@ -49,7 +49,9 @@ player = {
 
  end,
 
- update = function(self)
+ update = function(self, terrain)
+
+  self.g = terrain:get_g(self.world_y)
 
   -- controls
   self:_input()

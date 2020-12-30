@@ -3,8 +3,8 @@ downhill = {
  -- pre-set attributes
  y_gap_r = {64, 128},
  x_gap_r = {32, 64},
- x_offset_r = {-64, 64},
- gates_r = {20, 30},
+ x_offset_r = {-96, 96},
+ gates_r = {25, 40},
 
  -- constructor
  -- base_pos is y coordinate of start, seed is random seed value
@@ -19,7 +19,7 @@ downhill = {
   -- Generate the path
   new_dh.gates = {}
   new_dh.n_gates = self.gates_r[1] +
-                   rnd(self.gates_r[2] - self.gates_r[1])
+                   flr(rnd(self.gates_r[2] - self.gates_r[1] + 1))
   new_dh.n_passed = 0
   new_dh.gate_missed = false
   new_dh.course_start = 0
@@ -51,6 +51,8 @@ downhill = {
    add(new_dh.gates, {y, x_center, x_width})
 
   end
+
+  new_dh.len = new_dh.gates[new_dh.n_gates][1] - base_pos
 
   return new_dh
 
