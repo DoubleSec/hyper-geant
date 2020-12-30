@@ -25,7 +25,7 @@ player = {
 
  -- physics state
 
- steer_angle = 0,
+ steer_angle = -0.25,
 
  vx = 0,
  vy = 0,

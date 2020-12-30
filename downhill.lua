@@ -1,9 +1,9 @@
 downhill = {
 
  -- pre-set attributes
- y_gap_r = {64, 128},
- x_gap_r = {32, 64},
- x_offset_r = {-96, 96},
+ y_gap_r = {72, 128},
+ x_gap_r = {32, 96},
+ x_offset_r = {-128, 128},
  gates_r = {25, 40},
 
  -- constructor
@@ -25,24 +25,17 @@ downhill = {
   new_dh.course_start = 0
   new_dh.course_end = 0
 
-  for i = 1, new_dh.n_gates, 1 do
+  new_dh.gates[1] = {base_pos + 50, 0, 50}
+
+  for i = 2, new_dh.n_gates, 1 do
 
    -- choose y
-   if count(new_dh.gates) == 0 then
-    y = base_pos + self.y_gap_r[1] +
-        rnd(self.y_gap_r[2] - self.y_gap_r[1])
-   else
-    y = new_dh.gates[i-1][1] + self.y_gap_r[1] +
-        rnd(self.y_gap_r[2] - self.y_gap_r[1])
-   end
+   y = new_dh.gates[i-1][1] + self.y_gap_r[1] +
+       rnd(self.y_gap_r[2] - self.y_gap_r[1])
 
    -- choose x
    -- x format is {center, width}
-   if count(new_dh.gates) == 0 then
-    x_last = 0
-   else
-    x_last = new_dh.gates[i-1][2]
-   end
+   x_last = new_dh.gates[i-1][2]
 
    x_center = x_last + self.x_offset_r[1] +
               rnd(self.x_offset_r[2] - self.x_offset_r[1])
@@ -62,8 +55,8 @@ downhill = {
  draw = function(self, player)
 
   -- draw gates
+  -- TODO binary search for performance
   for i = 1, self.n_gates do
-
    if self.gates[i][1] > player.world_y - 128 and self.gates[i][1] < player.world_y + 256 then
 
     x_left = (self.gates[i][2] - self.gates[i][3] / 2) - player.world_x + player.x
@@ -77,6 +70,9 @@ downhill = {
      prev_x_left = (self.gates[i-1][2] - self.gates[i-1][3] / 2) - player.world_x + player.x
      prev_x_right = (self.gates[i-1][2] + self.gates[i-1][3] / 2) - player.world_x + player.x
      prev_y = self.gates[i-1][1] - player.world_y + player.y
+
+     -- start/finish line
+     if (i == self.n_gates) line(x_left - 20, y, x_right + 20, y, 12)
 
      -- left border, right border
      line(prev_x_left, prev_y, x_left, y, 8)
@@ -92,20 +88,23 @@ downhill = {
 
   end
 
-  print(self.n_passed.." | "..tostr(self.gate_missed))
+  print(self.n_passed.."/"..self.n_gates)
 
   if self.course_start == 0 then
    t = 0
+   c = 5
   elseif self.course_end == 0 then
    t = time() - self.course_start
+   c = 5
   else
    t = self.course_end - self.course_start
+   c = 3
   end
 
   if self.gate_missed then
-   print("out")
+   print("out", 8)
   else
-   print(flr(t * 100) / 100)
+   print(flr(t * 100) / 100, c)
   end
 
 
