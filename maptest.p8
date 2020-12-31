@@ -10,6 +10,7 @@ function _init()
   end
  end
 
+ p1 = player:new(-10000)
  course = downhill:new(-10000, 1)
  ter = terrain:new(-10000, course.len + 50, 1)
 
@@ -21,8 +22,8 @@ end
 function _update60()
 
  if btnp(4) or not debug then
- 	player:update(ter)
-  course:update(player)
+ 	p1:update(ter)
+  course:update(p1)
  end
 end
 
@@ -33,7 +34,7 @@ function _draw()
 
   map(0, 0, 0, 0, 16, 16)
 
-  camera(player.cx, player.cy)
+  camera(p1.cx, p1.cy)
 
   for xo = 0,2 do
    for yo = 0,2 do
@@ -42,14 +43,14 @@ function _draw()
   end
 
   -- reset camera
-  if (player.cx > 127 or player.cx < -127) player.cx = 0
-  if (player.cy > 127 or player.cy < -127) player.cy = 0
+  if (p1.cx > 127 or p1.cx < -127) p1.cx = 0
+  if (p1.cy > 127 or p1.cy < -127) p1.cy = 0
 
   camera(0,0)
 
-  player:draw()
-  ter:draw(player)
-  course:draw(player)
+  ter:draw(p1)
+  course:draw(p1)
+  p1:draw()
 
   cursor(0, 96, 5)
   print(stat(1))

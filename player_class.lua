@@ -1,63 +1,71 @@
 -- code for the player class
 player = {
- -- draw information
- sidx = 3,
- x = 64,
- y = 24,
-
- -- camera position
- cx = 0,
- cy = 0,
-
- -- world position
- world_x = 0,
- world_y = -10000,
 
  -- physics attributes
+ name = "player",
 
  steer_speed = (180 / 60) * (1 / 360),
  tuck_steer_multiplier = 0.33,
 
  drag_coef = 0.4 / 30, -- how much drag, dimensionless
  tuck_drag_multiplier = 0.7,
- g = 1 / 60,
  brake_coef = 0.04 / 30,
 
- -- physics state
+ tuck_time = 0.3 * 60,
 
- steer_angle = -0.25,
+ new = function(self, base_pos)
 
- vx = 0,
- vy = 0,
+  new_p = {}
+  setmetatable(new_p, player)
 
- v_angle = 0,
+  -- physics state
 
- d_vx = 0,
- d_vy = 0,
+  new_p.steer_angle = -0.25
+  new_p.vx = 0
+  new_p.vy = 0
 
- tuck = false,
+  new_p.v_angle = 0
+  new_p.name = "buttz"
 
- -- physics debug
- steer_p_unit = 0,
- steer_unit = 0,
+  new_p.d_vx = 0
+  new_p.d_vy = 0
+
+  new_p.tuck = 0
+
+  -- draw information
+  new_p.x = 64
+  new_p.y = 24
+
+  -- camera position
+  new_p.cx = 0
+  new_p.cy = 0
+
+  -- world position
+  new_p.world_x = 0
+  new_p.world_y = base_pos
+
+  return new_p
+
+ end,
 
  -- draw and update functions
  draw = function(self)
 
-  circfill(self.x, self.y, 1, 1)
   self:_force_draw()
+  circfill(self.x, self.y, 1, 1)
 
  end,
 
  update = function(self, terrain)
 
+  printh(self.name)
   self.g = terrain:get_g(self.world_y)
 
   -- controls
   self:_input()
 
   -- physics
-  self:_u_speed()
+  self:_physics()
 
   -- position updates
   self.cy = self.cy + self.vy
@@ -66,7 +74,7 @@ player = {
   self.world_x = self.world_x + self.vx
  end,
 
- _u_speed = function(self)
+ _physics = function(self)
 
   -- calculate units and angles
   steer_unit = {
@@ -134,11 +142,6 @@ player = {
   drag_dvy = drag_force * v_unit[1]
 
   -- debug
-  self.steer_dvx = steer_dvx
-  self.steer_dvy = steer_dvy
-
-  self.g_dvx = g_dvx
-  self.g_dvy = g_dvy
 
   self.drag_dvx = drag_dvx
   self.drag_dvy = drag_dvy
@@ -160,49 +163,25 @@ player = {
 
  _force_draw = function(self)
 
-  steer_unit = {
+  su = {
    cos(self.steer_angle),
    -sin(self.steer_angle)
   }
+  x = self.x
+  y = self.y
 
-  -- draw line for steer angle
-  line(
-   self.x, self.y,
-   self.x + steer_unit[2] * 10,
-   self.y + steer_unit[1] * 10,
-   12
-  )
+  -- draw skis
+  line(x-1, y, x-1 - su[2] * 4, y - su[1] * 4, 12)
+  line(x-1, y, x-1 + su[2] * 6, y + su[1] * 6, 12)
+  line(x+1, y, x+1 - su[2] * 4, y - su[1] * 4, 12)
+  line(x+1, y, x+1 + su[2] * 6, y + su[1] * 6, 12)
 
   -- line for drag force
   line(
    self.x, self.y,
-   self.x + self.drag_dvx * 200,
-   self.y + self.drag_dvy * 200,
+   self.x + self.drag_dvx * 100,
+   self.y + self.drag_dvy * 100,
    8
-  )
-
-  -- line for g force
-  line(
-   self.x, self.y,
-   self.x + self.g_dvx * 200,
-   self.y + self.g_dvy * 200,
-   11
-  )
-
-  -- line for steering force
-  line(
-   self.x, self.y,
-   self.x + self.steer_dvx * 200,
-   self.y + self.steer_dvy * 200,
-   9
-  )
-
-  -- line for velocity
-  line(
-   self.x, self.y,
-   self.x + self.vx * 10,
-   self.y + self.vy * 10,
-   1
   )
 
  end,
@@ -240,3 +219,5 @@ player = {
 
  end
 }
+
+player.__index = player
