@@ -2,7 +2,7 @@ downhill = {
 
  -- pre-set attributes
  y_gap_r = {72, 128},
- x_gap_r = {32, 96},
+ x_gap_r = {48, 96},
  x_offset_r = {-128, 128},
  gates_r = {25, 40},
 
