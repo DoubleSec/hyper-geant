@@ -3,10 +3,12 @@ version 29
 __lua__
 function _init()
 
- -- create initial state
- game = game_state:new({})
+ pal()
 
- st = state_machine:new(game)
+ -- create initial state
+ init_state = menu_state:new({})
+
+ st = state_machine:new(init_state)
 
 end
 
@@ -26,6 +28,7 @@ end
 #include downhill.lua
 #include terrain.lua
 #include states.lua
+#include menu.lua
 
 __gfx__
 00000000777777770000000000000000008885000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

@@ -30,6 +30,9 @@ player = {
 
   new_p.tuck = 0
 
+  new_p.drag_dvx = 0
+  new_p.drag_dvy = 0
+
   -- draw information
   new_p.x = 64
   new_p.y = 24

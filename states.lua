@@ -5,7 +5,7 @@ state_machine = {
  --  initial state
  new = function(self, init_state)
 
-  new_sm = {}
+  local new_sm = {}
   setmetatable(new_sm, state_machine)
 
   new_sm.state = init_state
@@ -20,7 +20,7 @@ state_machine = {
  -- update and draw are pretty obvious
 
  update = function(self)
-  self.state:update()
+  self.state:update(self)
  end,
 
  draw = function(self)
@@ -31,8 +31,9 @@ state_machine = {
  --  the constructor of the new state. any necessary messages or data that need
  --  to be passed are handled by the persistent attribute of the state machine.
  switch = function(self, to)
-  state:del(self.persistent)
-  state = to:new(self.persistent)
+  self.state:del(self.persistent)
+  self.state = to:new(self.persistent)
+  --printh(self.state.name)
  end
 }
 
@@ -41,20 +42,60 @@ state_machine.__index = state_machine
 -- menu state class
 menu_state = {
 
+ name = 'menu',
+
  new = function(self, init_table)
+
+  local n = {}
+  setmetatable(n, menu_state)
+
+  n.cn = course_name:new({})
+  n.step = 0
+  n.color_step = 0
+
+  return n
 
  end,
 
- update = function(self)
+ update = function(self, sm)
+
+  -- listen for control
+  if btnp(4) then
+   sm:switch(game_state)
+  end
 
  end,
 
  draw = function(self)
 
+  cls()
+
+  print('hyper geant', 40, 40, 9)
+  print('hyper geant', 40, 48, 10)
+  print('hyper geant', 40, 56, 11)
+  print('hyper geant', 40, 64, 12)
+  print('hyper geant', 40, 72, 13)
+  print('hyper geant', 40, 80, 14)
+
+  print('press \142 to start', 26, 96, 7)
+
+  self.step = (self.step + 1) % 60
+
+  if self.step == 59 then
+   pal(9, 9 + (self.color_step + 5) % 6)
+   pal(10, 9 + (self.color_step) % 6)
+   pal(11, 9 + (self.color_step + 1) % 6)
+   pal(12, 9 + (self.color_step + 2) % 6)
+   pal(13, 9 + (self.color_step + 3) % 6)
+   pal(14, 9 + (self.color_step + 4) % 6)
+   self.color_step = (self.color_step + 1) % 6
+  end
+
  end,
 
  del = function(self, store_table)
-
+  store_table["cn"] = self.cn
+  pal()
  end
 }
 menu_state.__index = menu_state
@@ -62,10 +103,12 @@ menu_state.__index = menu_state
 -- game state class
 game_state = {
 
+ name = "game",
+
  new = function(self, init_table)
 
   -- create the new instance
-  n = {}
+  local n = {}
   setmetatable(n, game_state)
 
   -- initialize the object table
@@ -86,7 +129,7 @@ game_state = {
   return n
  end,
 
- update = function(self)
+ update = function(self, sm)
 
   self.objs.p1:update(self.objs.ter)
   self.objs.course:update(self.objs.p1)
