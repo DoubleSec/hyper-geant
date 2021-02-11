@@ -3,65 +3,32 @@ version 29
 __lua__
 function _init()
 
- -- fill map
- for x = 0,16 do
-  for y = 0,16 do
-   mset(x, y, 1)
-  end
- end
+ pal()
 
- p1 = player:new(-10000)
- course = downhill:new(-10000, 1)
- ter = terrain:new(-10000, course.len + 50, 1)
+ -- create initial state
+ init_state = menu_state:new({})
 
- -- debug stepping
- debug = false
+ st = state_machine:new(init_state)
 
 end
 
 function _update60()
 
- if btnp(4) or not debug then
- 	p1:update(ter)
-  course:update(p1)
- end
+ st:update()
+
 end
 
 function _draw()
 
- if btnp(4) or not debug then
-  cls()
+ st:draw()
 
-  map(0, 0, 0, 0, 16, 16)
-
-  camera(p1.cx, p1.cy)
-
-  for xo = 0,2 do
-   for yo = 0,2 do
-    map(16, 0, 128 * (xo -1), 128 * (yo -1), 16, 16)
-   end
-  end
-
-  -- reset camera
-  if (p1.cx > 127 or p1.cx < -127) p1.cx = 0
-  if (p1.cy > 127 or p1.cy < -127) p1.cy = 0
-
-  camera(0,0)
-
-  ter:draw(p1)
-  course:draw(p1)
-  p1:draw()
-
-  cursor(0, 96, 5)
-  print(stat(1))
-  print(stat(2))
-
- end
 end
 -->8
 #include player_class.lua
 #include downhill.lua
 #include terrain.lua
+#include states.lua
+#include menu.lua
 
 __gfx__
 00000000777777770000000000000000008885000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000

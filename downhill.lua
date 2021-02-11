@@ -2,7 +2,7 @@ downhill = {
 
  -- pre-set attributes
  y_gap_r = {72, 128},
- x_gap_r = {32, 96},
+ x_gap_r = {48, 96},
  x_offset_r = {-128, 128},
  gates_r = {25, 40},
 
@@ -106,7 +106,11 @@ downhill = {
   else
    print(flr(t * 100) / 100, c)
   end
-
+  
+  if player.vx == 0 and player.vy == 0 then
+   print('hold \151 to tuck and go faster', 0, 40, 2)
+   print('hold \142 to restart', 0, 50, 2)
+  end
 
  end,
 

@@ -2,7 +2,6 @@
 player = {
 
  -- physics attributes
- name = "player",
 
  steer_speed = (180 / 60) * (1 / 360),
  tuck_steer_multiplier = 0.33,
@@ -25,12 +24,14 @@ player = {
   new_p.vy = 0
 
   new_p.v_angle = 0
-  new_p.name = "buttz"
 
   new_p.d_vx = 0
   new_p.d_vy = 0
 
   new_p.tuck = 0
+
+  new_p.drag_dvx = 0
+  new_p.drag_dvy = 0
 
   -- draw information
   new_p.x = 64
@@ -52,13 +53,12 @@ player = {
  draw = function(self)
 
   self:_force_draw()
-  circfill(self.x, self.y, 1, 1)
+  line(self.x, self.y, self.x, self.y -4, 1)
 
  end,
 
  update = function(self, terrain)
 
-  printh(self.name)
   self.g = terrain:get_g(self.world_y)
 
   -- controls
@@ -178,9 +178,9 @@ player = {
 
   -- line for drag force
   line(
-   self.x, self.y,
+   self.x, self.y-4,
    self.x + self.drag_dvx * 100,
-   self.y + self.drag_dvy * 100,
+   self.y-4 + self.drag_dvy * 100,
    8
   )
 
