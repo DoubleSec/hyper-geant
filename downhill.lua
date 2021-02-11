@@ -106,7 +106,11 @@ downhill = {
   else
    print(flr(t * 100) / 100, c)
   end
-
+  
+  if player.vx == 0 and player.vy == 0 then
+   print('hold \151 to tuck and go faster', 0, 40, 2)
+   print('hold \142 to restart', 0, 50, 2)
+  end
 
  end,
 

@@ -104,6 +104,8 @@ menu_state.__index = menu_state
 game_state = {
 
  name = "game",
+ 
+ restart_count = 0,
 
  new = function(self, init_table)
 
@@ -130,6 +132,17 @@ game_state = {
  end,
 
  update = function(self, sm)
+ 
+  -- listen for control
+  if btn(4) then
+   self.restart_count = self.restart_count + 1
+
+   if self.restart_count > 90 then
+    sm:switch(game_state)
+   end
+  else
+   self.restart_count = 0
+  end
 
   self.objs.p1:update(self.objs.ter)
   self.objs.course:update(self.objs.p1)
@@ -146,6 +159,12 @@ game_state = {
   self.objs.ter:draw(self.objs.p1)
   self.objs.course:draw(self.objs.p1)
   self.objs.p1:draw()
+
+  -- print restarting message
+  if btn(4) then
+   print('restarting', 40, 60, 8)
+   cursor()
+  end
 
  end,
 
