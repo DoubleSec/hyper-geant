@@ -6,7 +6,7 @@ function _init()
  pal()
 
  -- create initial state
- init_state = menu_state:new({})
+ init_state = intro_state:new({})
 
  st = state_machine:new(init_state)
 

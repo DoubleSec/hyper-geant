@@ -13,6 +13,9 @@ terrain = {
   setmetatable(new_t, terrain)
   new_t.seed = seed
 
+  --srand(seed)
+  srand(seed)
+
   new_t.n = self.n_changes[1] + flr(rnd(self.n_changes[2] - self.n_changes[1] + 1))
   new_t.ter = {}
 

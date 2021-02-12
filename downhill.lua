@@ -15,6 +15,7 @@ downhill = {
   new_dh.seed = seed
 
   --srand(seed)
+  srand(seed)
 
   -- Generate the path
   new_dh.gates = {}
