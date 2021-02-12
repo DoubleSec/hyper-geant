@@ -40,16 +40,15 @@ state_machine = {
 state_machine.__index = state_machine
 
 -- menu state class
-menu_state = {
+intro_state = {
 
- name = 'menu',
+ name = 'intro',
 
  new = function(self, init_table)
 
   local n = {}
-  setmetatable(n, menu_state)
+  setmetatable(n, intro_state)
 
-  n.cn = course_name:new({})
   n.step = 0
   n.color_step = 0
 
@@ -61,7 +60,7 @@ menu_state = {
 
   -- listen for control
   if btnp(4) then
-   sm:switch(game_state)
+   sm:switch(select_state)
   end
 
  end,
@@ -79,9 +78,9 @@ menu_state = {
 
   print('press \142 to start', 26, 96, 7)
 
-  self.step = (self.step + 1) % 60
+  self.step = (self.step + 1) % 6
 
-  if self.step == 59 then
+  if self.step == 5 then
    pal(9, 9 + (self.color_step + 5) % 6)
    pal(10, 9 + (self.color_step) % 6)
    pal(11, 9 + (self.color_step + 1) % 6)
@@ -94,11 +93,83 @@ menu_state = {
  end,
 
  del = function(self, store_table)
-  store_table["cn"] = self.cn
   pal()
  end
 }
-menu_state.__index = menu_state
+intro_state.__index = intro_state
+
+select_state = {
+ 
+ name = "select",
+
+ new = function(self, init_table)
+  
+  local n = {}
+  setmetatable(n, select_state)
+
+  -- check if there's an existing course name
+  if init_table.cname ~= nil then
+   n.cname = init_table.cname
+  else
+   n.cname = course_name:new({})
+  end
+
+  n.iname = n.cname.letters
+
+  n.blink = 0
+  n.cur_pos = 0
+  n.cur_val = n.cname.lookup[n.iname[1]] - 1
+
+  return n
+   
+ end,
+
+ update = function(self, sm)
+  
+  -- controls
+  if btnp(0) then
+   self.cur_pos = (self.cur_pos - 1) % 5
+   self.cur_val = self.cname.lookup[self.iname[self.cur_pos + 1]] - 1
+  elseif btnp(1) then
+   self.cur_pos = (self.cur_pos + 1) % 5
+   self.cur_val = self.cname.lookup[self.iname[self.cur_pos + 1]] - 1 
+  elseif btnp(2) then
+   self.cur_val = (self.cur_val + 1) % 27
+  elseif btnp(3) then
+   self.cur_val = (self.cur_val - 1) % 27
+  elseif btnp(4) then
+   self.cname.letters = self.iname
+   sm:switch(game_state)
+  end
+
+  self.iname[self.cur_pos + 1] = self.cname.rev[self.cur_val + 1]
+
+ end,
+
+ draw = function(self)
+  cls()
+
+  self.blink = (self.blink + 1) % 60
+
+  print("choose a course!", 32, 28)
+
+  for i, char in pairs(self.iname) do
+   
+   if i ~= self.cur_pos + 1 or self.blink < 30 then
+    print(char, 30 + i * 10, 60)
+   end
+  end
+
+  print("press \142 to confirm", 26, 92)
+
+ end,
+
+ del = function(self, store_table)
+  pal()
+  store_table.cname = self.cname
+ end
+}
+select_state.__index = select_state
 
 -- game state class
 game_state = {
@@ -113,13 +184,15 @@ game_state = {
   local n = {}
   setmetatable(n, game_state)
 
-  -- initialize the object table
+  n.cname = init_table.cname
+
+  -- initialize the object table  
   n.objs = {}
 
   -- add things to the object table
   n.objs["p1"] = player:new(-10000)
-  n.objs["course"] = downhill:new(-10000, 1)
-  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, 1)
+  n.objs["course"] = downhill:new(-10000, n.cname:to_num())
+  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, n.cname:to_num())
 
   -- set up the map
   for x = 0,16 do
@@ -159,6 +232,8 @@ game_state = {
   self.objs.ter:draw(self.objs.p1)
   self.objs.course:draw(self.objs.p1)
   self.objs.p1:draw()
+
+  print("mount "..self.cname:to_str(), 80, 4, 5)
 
   -- print restarting message
   if btn(4) then

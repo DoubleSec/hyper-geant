@@ -8,25 +8,26 @@ course_name = {
   m = 13, n = 14, o = 15, p = 16,
   q = 17, r = 18, s = 19, t = 20,
   u = 21, v = 22, w = 23, x = 24,
-  y = 25, z = 26
+  y = 25, z = 26, _ = 27
  },
 
  new = function(self, letters)
+
   n = {}
   setmetatable(n, course_name)
 
-  -- this is a list
-  if count(letters) == 0 then
-
    -- make a reverse lookup table
-   rev = {}
-   for k, v in pairs(self.lookup) do
-    rev[v] = k
-   end
+  rev = {}
+  for k, v in pairs(self.lookup) do
+   rev[v] = k
+  end
+  n.rev = rev
 
+  if count(letters) == 0 then
+   
    n.letters = {}
    for i=1,5 do
-    add(n.letters, 1 + flr(rnd(26)))
+    add(n.letters, n.rev[1 + flr(rnd(26))])
    end
 
   else
@@ -39,18 +40,11 @@ course_name = {
  -- turn the course name into a number
  to_num = function(self)
 
-  t = {}
-
-  -- fill in spaces
-  for k, v in pairs(self.letters) do
-   if v == ' ' then
-    t[k] = 'a'
-   else
-    t[k] = v
-   end
-  end
-
-  return t[1] * 1000 + t[2] * 100 + t[3] * 10 + t[4] + t[5] * 0.1
+  return self.lookup[self.letters[1]] * 1000 +
+         self.lookup[self.letters[2]] * 100 +
+         self.lookup[self.letters[3]] * 10 +
+         self.lookup[self.letters[4]] +
+         self.lookup[self.letters[5]] * 0.1
  end,
 
  to_str = function(self)
