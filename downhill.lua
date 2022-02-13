@@ -142,6 +142,11 @@ downhill = {
 
    if (crossing_idx == count(self.gates) and not self.gate_missed) then
     self.course_end = time()
+    -- write the course-completed status bit
+    poke(0x5f87, 1)
+    -- write the finishing time to gpio pins
+    local write_time = convert_time(self.course_end - self.course_start)
+    poke(0x5f85, write_time[1], write_time[2])
    end
 
   end
@@ -156,6 +161,16 @@ downhill = {
 }
 
 downhill.__index = downhill
+
+-- convert fixed point time to something we can write
+convert_time = function(t)
+
+ local seconds = flr(t)
+ local hundredths = flr((t - flr(t)) * 100)
+
+ return {seconds, hundredths}
+
+end
 
 -- gates is a table of gate data, {x, x_center, x_width, passed}
 gate_search = function(gates, player)

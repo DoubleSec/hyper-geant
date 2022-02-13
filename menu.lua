@@ -38,7 +38,7 @@ course_name = {
  end,
 
  -- turn the course name into a number
- to_num = function(self)
+ to_seed = function(self)
 
   return self.lookup[self.letters[1]] * 1000 +
          self.lookup[self.letters[2]] * 100 +
@@ -47,9 +47,21 @@ course_name = {
          self.lookup[self.letters[5]] * 0.1
  end,
 
+ -- letters as numbers for gpio
+ to_nums = function(self)
+  
+  local nums = {}
+
+  for i in all(self.letters) do
+   add(nums, self.lookup[i])
+  end
+
+  return nums
+ end,
+
  to_str = function(self)
 
-  res = ''
+  local res = ''
 
   for i in all(self.letters) do
    res = res..i

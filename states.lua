@@ -166,6 +166,9 @@ select_state = {
 
  del = function(self, store_table)
   pal()
+  local lids = self.cname:to_nums()
+  -- write the name of the course to gpio pins
+  poke(0x5f80, lids[1], lids[2], lids[3], lids[4], lids[5])
   store_table.cname = self.cname
  end
 }
@@ -191,8 +194,8 @@ game_state = {
 
   -- add things to the object table
   n.objs["p1"] = player:new(-10000)
-  n.objs["course"] = downhill:new(-10000, n.cname:to_num())
-  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, n.cname:to_num())
+  n.objs["course"] = downhill:new(-10000, n.cname:to_seed())
+  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, n.cname:to_seed())
 
   -- set up the map
   for x = 0,16 do
@@ -200,6 +203,9 @@ game_state = {
     mset(x, y, 1)
    end
   end
+
+  -- set the completed-status gpio pin
+  poke(0x5f87, 0)
 
   return n
  end,
