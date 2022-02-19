@@ -8,11 +8,13 @@ downhill = {
 
  -- constructor
  -- base_pos is y coordinate of start, seed is random seed value
- new = function(self, base_pos, seed)
+ new = function(self, base_pos, seed, pname)
 
   new_dh = {}
   setmetatable(new_dh, downhill)
   new_dh.seed = seed
+
+  new_dh.pname = pname
 
   --srand(seed)
   srand(seed)
@@ -47,6 +49,9 @@ downhill = {
   end
 
   new_dh.len = new_dh.gates[new_dh.n_gates][1] - base_pos
+
+  -- set the course as not completed
+  poke(0x5f87, 0)
 
   return new_dh
 
@@ -89,7 +94,7 @@ downhill = {
 
   end
 
-  print(self.n_passed.."/"..self.n_gates)
+  print(self.n_passed.."/"..self.n_gates, 2, 2)
 
   if self.course_start == 0 then
    t = 0
@@ -103,9 +108,9 @@ downhill = {
   end
 
   if self.gate_missed then
-   print("out", 8)
+   print("out", 2, 8, 8)
   else
-   print(flr(t * 100) / 100, c)
+   print(self.pname:to_str()..': '..flr(t * 100) / 100, 2, 8, c)
   end
   
   if player.vx == 0 and player.vy == 0 then

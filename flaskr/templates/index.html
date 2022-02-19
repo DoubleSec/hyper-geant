@@ -522,24 +522,24 @@
 
 			}
 			e.type = "application/javascript";
-			e.src = "hypergeant.js";
-			e.id = "e_script";
+			e.src = "{{ url_for('static', filename = 'hypergeant.js') }}";
+		e.id = "e_script";
 
-			document.body.appendChild(e); // load and run
+		document.body.appendChild(e); // load and run
 
-			// hide start button and show canvas / menu buttons. hide start button
-			el = document.getElementById("p8_start_button");
-			if (el) el.style.display = "none";
+		// hide start button and show canvas / menu buttons. hide start button
+		el = document.getElementById("p8_start_button");
+		if (el) el.style.display = "none";
 
-			// add #playing for touchscreen devices (allows back button to close)
-			// X button can also be used to trigger this 
-			if (p8_touch_detected) {
-				window.location.hash = "#playing";
-				window.onhashchange = function () {
-					if (window.location.hash.search("playing") < 0)
-						window.location.reload();
-				}
+		// add #playing for touchscreen devices (allows back button to close)
+		// X button can also be used to trigger this 
+		if (p8_touch_detected) {
+			window.location.hash = "#playing";
+			window.onhashchange = function () {
+				if (window.location.hash.search("playing") < 0)
+					window.location.reload();
 			}
+		}
 		}
 
 
@@ -809,57 +809,85 @@
 		<!-- Add content below the cart here -->
 
 		<div id="results" style="max-width:800px; margin:auto;">
-			<p id="cname"></p>
-			<p id="ctime"></p>
+			<p id="pstatus"></p>
+			<p id="best"></p>
 		</div>
 
-		<!-- Code to handle GPIO stuff -->
-		<script src="https://unpkg.com/pico8-gpio-listener@0.2.2/pico8-gpio-listener.js"></script>
-		<script type="text/javascript">
-
-			const letterMap = [
-				"A", "B", "C", "D", "E", "F", "G", "H",
-				"I", "J", "K", "L", "M", "N", "O", "P",
-				"Q", "R", "S", "T", "U", "V", "W", "X",
-				"Y", "Z", "_"
-			];
-
-			(function () {
-				var gpio = getP8Gpio();
-
-				const course_name = [];
-				const time = [];
-				gpio.subscribe(function (newIndices) {
-
-					/* handle the course name */
-					var cname = document.getElementById("cname");
-
-					for (var i = 0; i < 5; i++) {
-						course_name[i] = letterMap[gpio[i] - 1];
-					}
-					cname.innerHTML = "MOUNT " + course_name.join('');
-
-					/* handle the time */
-					var ctime = document.getElementById("ctime");
-
-					for (var j = 0; j < 2; j++) {
-						var zerofilled = ('00' + gpio[j + 5]).slice(-2);
-						time[j] = zerofilled;
-					}
-
-					/* check if the course is competed */
-					if (gpio[7] > 0)
-						ctime.innerHTML = "TIME: " + time.join('.');
-					else
-						ctime.innerHTML = "TIME: ";
-
-					console.log(newIndices);
-					console.log(gpio);
-				});
-			})();
-		</script>
-
 	</div> <!-- body_0 -->
+
+	<!-- Code to handle GPIO stuff -->
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+	<script src="https://unpkg.com/pico8-gpio-listener@0.2.2/pico8-gpio-listener.js"></script>
+	<script type="text/javascript">
+
+		$SCRIPT_ROOT = {{ request.script_root|tojson }};
+
+		
+		/* Set the course seed. */
+		$.getJSON($SCRIPT_ROOT + '/_get_seed', function(data) {
+			var gpio = getP8Gpio();
+			var offset = 16;
+			var bytes = data.result;
+			console.log(bytes);
+			for (var i = 0; i < 4; i++) {
+				gpio[offset + i] = bytes[i];
+			}
+		});
+
+		/* Track the best time. */
+		var best_time = -1;
+
+		const letterMap = [
+			"A", "B", "C", "D", "E", "F", "G", "H",
+			"I", "J", "K", "L", "M", "N", "O", "P",
+			"Q", "R", "S", "T", "U", "V", "W", "X",
+			"Y", "Z", "_"
+		];
+
+		(function () {
+			var gpio = getP8Gpio();
+			
+			gpio.subscribe(function (newIndices) {
+
+				/* handle the player name */
+				const player_name = [];
+
+				for (var i = 0; i < 5; i++) {
+					player_name[i] = letterMap[gpio[i] - 1];
+				}
+
+				/* handle the time */
+				const time = [];
+				const num_time = [];
+
+				for (var j = 0; j < 2; j++) {
+					num_time[j] = gpio[j + 5];
+					var zerofilled = ('00' + gpio[j + 5]).slice(-2);
+					time[j] = zerofilled;
+				}
+
+				var pstatus = document.getElementById("pstatus");
+
+				/* check if the course is completed */
+				if (gpio[7] > 0) {
+
+					/* check if the new time is the best time. */
+					var float_time = num_time[0] + num_time[1] * 0.01;
+					if ((best_time < 0) || (float_time < best_time))
+						best_time = float_time;
+					if (best_time > 0)
+						document.getElementById("best").innerHTML = "BEST: " + best_time;
+
+					pstatus.innerHTML = player_name.join('') + ': ' + time.join('.');
+				}
+				else
+					pstatus.innerHTML = player_name.join('') + ': ';
+
+				console.log(newIndices);
+				console.log(gpio);
+			});
+		})();
+	</script>
 </body>
 
 </html>

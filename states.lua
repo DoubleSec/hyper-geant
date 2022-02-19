@@ -78,9 +78,9 @@ intro_state = {
 
   print('press \142 to start', 26, 96, 7)
 
-  self.step = (self.step + 1) % 6
+  self.step = (self.step + 1) % 12
 
-  if self.step == 5 then
+  if self.step == 11 then
    pal(9, 9 + (self.color_step + 5) % 6)
    pal(10, 9 + (self.color_step) % 6)
    pal(11, 9 + (self.color_step + 1) % 6)
@@ -107,18 +107,18 @@ select_state = {
   local n = {}
   setmetatable(n, select_state)
 
-  -- check if there's an existing course name
-  if init_table.cname ~= nil then
-   n.cname = init_table.cname
+  -- check if there's an existing player name
+  if init_table.pname ~= nil then
+   n.pname = init_table.pname
   else
-   n.cname = course_name:new({})
+   n.pname = player_name:new({})
   end
 
-  n.iname = n.cname.letters
+  n.iname = n.pname.letters
 
   n.blink = 0
   n.cur_pos = 0
-  n.cur_val = n.cname.lookup[n.iname[1]] - 1
+  n.cur_val = n.pname.lookup[n.iname[1]] - 1
 
   return n
    
@@ -128,21 +128,21 @@ select_state = {
   
   -- controls
   if btnp(0) then
-   self.cur_pos = (self.cur_pos - 1) % 5
-   self.cur_val = self.cname.lookup[self.iname[self.cur_pos + 1]] - 1
+   self.cur_pos = (self.cur_pos - 1) % 3
+   self.cur_val = self.pname.lookup[self.iname[self.cur_pos + 1]] - 1
   elseif btnp(1) then
-   self.cur_pos = (self.cur_pos + 1) % 5
-   self.cur_val = self.cname.lookup[self.iname[self.cur_pos + 1]] - 1 
+   self.cur_pos = (self.cur_pos + 1) % 3
+   self.cur_val = self.pname.lookup[self.iname[self.cur_pos + 1]] - 1 
   elseif btnp(2) then
-   self.cur_val = (self.cur_val + 1) % 27
+   self.cur_val = (self.cur_val - 1) % 26
   elseif btnp(3) then
-   self.cur_val = (self.cur_val - 1) % 27
+   self.cur_val = (self.cur_val + 1) % 26
   elseif btnp(4) then
-   self.cname.letters = self.iname
+   self.pname.letters = self.iname
    sm:switch(game_state)
   end
 
-  self.iname[self.cur_pos + 1] = self.cname.rev[self.cur_val + 1]
+  self.iname[self.cur_pos + 1] = self.pname.rev[self.cur_val + 1]
 
  end,
 
@@ -151,12 +151,12 @@ select_state = {
 
   self.blink = (self.blink + 1) % 60
 
-  print("choose a course!", 32, 28)
+  print("enter your initials!", 24, 28)
 
   for i, char in pairs(self.iname) do
    
    if i ~= self.cur_pos + 1 or self.blink < 30 then
-    print(char, 30 + i * 10, 60)
+    print(char, 43 + i * 10, 60)
    end
   end
 
@@ -166,10 +166,10 @@ select_state = {
 
  del = function(self, store_table)
   pal()
-  local lids = self.cname:to_nums()
+  local lids = self.pname:to_nums()
   -- write the name of the course to gpio pins
-  poke(0x5f80, lids[1], lids[2], lids[3], lids[4], lids[5])
-  store_table.cname = self.cname
+  poke(0x5f80, lids[1], lids[2], lids[3])
+  store_table.pname = self.pname
  end
 }
 select_state.__index = select_state
@@ -187,15 +187,19 @@ game_state = {
   local n = {}
   setmetatable(n, game_state)
 
-  n.cname = init_table.cname
+  n.pname = init_table.pname
 
   -- initialize the object table  
   n.objs = {}
 
+  -- retrieve the seed from gpio
+  seed = $0x5f90
+
   -- add things to the object table
   n.objs["p1"] = player:new(-10000)
-  n.objs["course"] = downhill:new(-10000, n.cname:to_seed())
-  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, n.cname:to_seed())
+  -- eventually will come off gpio
+  n.objs["course"] = downhill:new(-10000, seed, n.pname)
+  n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, seed)
 
   -- set up the map
   for x = 0,16 do
@@ -238,8 +242,6 @@ game_state = {
   self.objs.ter:draw(self.objs.p1)
   self.objs.course:draw(self.objs.p1)
   self.objs.p1:draw()
-
-  print("mount "..self.cname:to_str(), 80, 4, 5)
 
   -- print restarting message
   if btn(4) then
