@@ -166,9 +166,8 @@ select_state = {
 
  del = function(self, store_table)
   pal()
-  local lids = self.pname:to_nums()
   -- write the name of the course to gpio pins
-  poke(0x5f80, lids[1], lids[2], lids[3])
+  gpio_set_pname(self.pname)
   store_table.pname = self.pname
  end
 }
@@ -193,12 +192,12 @@ game_state = {
   n.objs = {}
 
   -- retrieve the seed from gpio
-  seed = $0x5f90
+  seed = gpio_get_seed()
 
   -- add things to the object table
   n.objs["p1"] = player:new(-10000)
   -- eventually will come off gpio
-  n.objs["course"] = downhill:new(-10000, seed, n.pname)
+  n.objs["course"] = downhill:new(-10000, seed, n.pname, init_table.best)
   n.objs["ter"] = terrain:new(-10000, n.objs.course.len + 50, seed)
 
   -- set up the map
@@ -208,16 +207,13 @@ game_state = {
    end
   end
 
-  -- set the completed-status gpio pin
-  poke(0x5f87, 0)
-
   return n
  end,
 
  update = function(self, sm)
  
   -- listen for control
-  if btn(4) then
+  if btn(5) then
    self.restart_count = self.restart_count + 1
 
    if self.restart_count > 90 then
@@ -244,8 +240,9 @@ game_state = {
   self.objs.p1:draw()
 
   -- print restarting message
-  if btn(4) then
-   print('restarting', 40, 60, 8)
+  if self.restart_count > 0 then
+   rectfill(43, 66, 83, 72, 8)
+   print('restarting', 44, 67, 7)
    cursor()
   end
 
@@ -253,6 +250,7 @@ game_state = {
 
  del = function(self, store_table)
 
+  store_table.best = self.objs.course.best
  end
 }
 game_state.__index = game_state

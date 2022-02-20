@@ -171,10 +171,10 @@ player = {
   y = self.y
 
   -- draw skis
-  line(x-1, y, x-1 - su[2] * 4, y - su[1] * 4, 12)
-  line(x-1, y, x-1 + su[2] * 6, y + su[1] * 6, 12)
-  line(x+1, y, x+1 - su[2] * 4, y - su[1] * 4, 12)
-  line(x+1, y, x+1 + su[2] * 6, y + su[1] * 6, 12)
+  line(x-1, y, x-1 - su[2] * 4, y - su[1] * 4, 2)
+  line(x-1, y, x-1 + su[2] * 6, y + su[1] * 6, 2)
+  line(x+1, y, x+1 - su[2] * 4, y - su[1] * 4, 2)
+  line(x+1, y, x+1 + su[2] * 6, y + su[1] * 6, 2)
 
   -- line for drag force
   line(
@@ -188,7 +188,7 @@ player = {
 
  _input = function(self)
 
-  self.tuck = btn(5)
+  self.tuck = btn(4)
 
   if self.tuck == true then
    steer_speed = self.steer_speed * self.tuck_steer_multiplier

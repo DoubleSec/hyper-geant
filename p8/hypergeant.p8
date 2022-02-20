@@ -1,5 +1,5 @@
 pico-8 cartridge // http://www.pico-8.com
-version 33
+version 35
 __lua__
 function _init()
 
@@ -24,7 +24,8 @@ function _draw()
 
 end
 -->8
-#include player_class.lua
+#include gpio.lua
+#include player.lua
 #include downhill.lua
 #include terrain.lua
 #include states.lua
