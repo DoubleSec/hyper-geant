@@ -107,9 +107,15 @@ downhill = {
 
     end
 
+    if i % 2 == 0 then
+     gc = 1
+    else
+     gc = 8
+    end
+
     -- left side, right side
-    line(x_left, y, x_left, y - 5, 8)
-    line(x_right, y, x_right, y - 5, 8)
+    line(x_left, y, x_left, y - 5, gc)
+    line(x_right, y, x_right, y - 5, gc)
 
     -- timing line
     if self.gates[i][4] > 0 then

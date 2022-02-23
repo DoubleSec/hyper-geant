@@ -809,8 +809,8 @@
 		<!-- Add content below the cart here -->
 
 		<div id="results" style="max-width:800px; margin:auto;">
-			<p id="pstatus"></p>
 			<p id="best"></p>
+			<ul id="time"></ul>
 		</div>
 
 	</div> <!-- body_0 -->
@@ -818,76 +818,8 @@
 	<!-- Code to handle GPIO stuff -->
 	<script src="//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
 	<script src="https://unpkg.com/pico8-gpio-listener@0.2.2/pico8-gpio-listener.js"></script>
-	<script type="text/javascript">
-
-		$SCRIPT_ROOT = {{ request.script_root|tojson }};
-
-		
-		/* Set the course seed. */
-		$.getJSON($SCRIPT_ROOT + '/_get_seed', function(data) {
-			var gpio = getP8Gpio();
-			var offset = 16;
-			var bytes = data.result;
-			console.log(bytes);
-			for (var i = 0; i < 4; i++) {
-				gpio[offset + i] = bytes[i];
-			}
-		});
-
-		/* Track the best time. */
-		var best_time = -1;
-
-		const letterMap = [
-			"A", "B", "C", "D", "E", "F", "G", "H",
-			"I", "J", "K", "L", "M", "N", "O", "P",
-			"Q", "R", "S", "T", "U", "V", "W", "X",
-			"Y", "Z", "_"
-		];
-
-		(function () {
-			var gpio = getP8Gpio();
-			
-			gpio.subscribe(function (newIndices) {
-
-				/* handle the player name */
-				const player_name = [];
-
-				for (var i = 0; i < 5; i++) {
-					player_name[i] = letterMap[gpio[i] - 1];
-				}
-
-				/* handle the time */
-				const time = [];
-				const num_time = [];
-
-				for (var j = 0; j < 2; j++) {
-					num_time[j] = gpio[j + 5];
-					var zerofilled = ('00' + gpio[j + 5]).slice(-2);
-					time[j] = zerofilled;
-				}
-
-				var pstatus = document.getElementById("pstatus");
-
-				/* check if the course is completed */
-				if (gpio[7] > 0) {
-
-					/* check if the new time is the best time. */
-					var float_time = num_time[0] + num_time[1] * 0.01;
-					if ((best_time < 0) || (float_time < best_time))
-						best_time = float_time;
-					if (best_time > 0)
-						document.getElementById("best").innerHTML = "BEST: " + best_time;
-
-					pstatus.innerHTML = player_name.join('') + ': ' + time.join('.');
-				}
-				else
-					pstatus.innerHTML = player_name.join('') + ': ';
-
-				console.log(newIndices);
-				console.log(gpio);
-			});
-		})();
-	</script>
+	<script>$SCRIPT_ROOT = {{ request.script_root | tojson }};</script>
+	<script src = "{{ url_for('static', filename = 'gpio.js') }}"></script>
 </body>
 
 </html>
