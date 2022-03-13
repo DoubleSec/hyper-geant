@@ -1,4 +1,6 @@
-*.js
+hypergeant.js
 *.html
 !index.html
 *.bin/
+__pycache__/
+*.db
