@@ -1,4 +1,4 @@
-*.js
+hypergeant.js
 *.html
 !index.html
 *.bin/
